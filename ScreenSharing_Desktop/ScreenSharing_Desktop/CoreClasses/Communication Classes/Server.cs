@@ -77,11 +77,9 @@ class Server
     {
         try
         {
-            server.Server.Shutdown(SocketShutdown.Both);
+            server.Stop();
             server.Server.Close();
-            server.Stop();
-            server.Stop();
-            Console.WriteLine("Server has been stopped");
+            Debug.WriteLine("Server has been stopped");
             ServerStarted = false;
         }
         catch

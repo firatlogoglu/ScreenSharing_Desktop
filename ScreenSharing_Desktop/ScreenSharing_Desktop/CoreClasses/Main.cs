@@ -132,23 +132,23 @@ class Main
     private Bitmap _screenImage;
     private double _transferSpeed;
 
-    private  string _URL;                          /// File Path
-    private  Thread sendingThread;
-    private  Thread receivingThread;
+    private string _URL;                          /// File Path
+    private Thread sendingThread;
+    private Thread receivingThread;
 
-    private  string _HostName = "";
+    private string _HostName = "";
     private int fps = 0;
-    private  object HostName_Lock = new object();
-    private  object Lck_IsSendingEnabled = new object();
-    private  object Lck_IsReceivingEnabled = new object();
-    private  object Lck_FPS = new object();
-    private  object Lck_ScreenImage = new object();
-    private  object Lck_IsImageReceived = new object();
-    private  object Lck_IsImageSent = new object();
-    private  object Lck_TransferSpeed = new object();
-    private  object Lck_IsControlsEnabled = new object();
+    private object HostName_Lock = new object();
+    private object Lck_IsSendingEnabled = new object();
+    private object Lck_IsReceivingEnabled = new object();
+    private object Lck_FPS = new object();
+    private object Lck_ScreenImage = new object();
+    private object Lck_IsImageReceived = new object();
+    private object Lck_IsImageSent = new object();
+    private object Lck_TransferSpeed = new object();
+    private object Lck_IsControlsEnabled = new object();
 
-    public  string HostName
+    public string HostName
     {
 
         get
@@ -187,13 +187,13 @@ class Main
         Receiver
     }
 
-    public  Main(CommunicationTypes communicationType)
+    public Main(CommunicationTypes communicationType)
     {
         Comm = new Communication();
-        if (communicationType==CommunicationTypes.Sender)
+        if (communicationType == CommunicationTypes.Sender)
         {
-            string serverIP=Comm.CreateServer();
-            Debug.WriteLine("Server IP: " + serverIP);            
+            string serverIP = Comm.CreateServer();
+            Debug.WriteLine("Server IP: " + serverIP);
         }
     }
     /// <summary>
@@ -238,10 +238,10 @@ class Main
             stopwatch.Restart();
             while (Comm.isClientConnected)
             {
-               // double t1 = stopwatch.Elapsed.TotalMilliseconds;
+                // double t1 = stopwatch.Elapsed.TotalMilliseconds;
                 /// get image Here
                 /// 
-                byte[] imageBytes= ImageProcessing.GetScreenBytes();
+                byte[] imageBytes = ImageProcessing.GetScreenBytes();
                 //double t2 = stopwatch.Elapsed.TotalMilliseconds;
                 /// Send image to client   here
                 /// 
@@ -263,16 +263,16 @@ class Main
                     byte ControlByte = responseBytes[0];
                     bool leftClicked = Comm.ReadBit(ControlByte, 1);
                     bool rightClicked = Comm.ReadBit(ControlByte, 2);
-                    if(leftClicked || rightClicked)
+                    if (leftClicked || rightClicked)
                     {
-                        if(leftClicked)
+                        if (leftClicked)
                         {
                             wasLeftButtonClicked = true;
                             mouse_event(MOUSEEVENTF_LEFTDOWN, (uint)cursor_x, (uint)cursor_y, 0, 0);
                         }
                         else
                         {
-                            if(wasLeftButtonClicked)
+                            if (wasLeftButtonClicked)
                             {
                                 mouse_event(MOUSEEVENTF_LEFTUP, (uint)cursor_x, (uint)cursor_y, 0, 0);
                                 wasLeftButtonClicked = false;
@@ -309,7 +309,7 @@ class Main
                 bytesSent += imageBytes.Length;
                 if (stopwatch.Elapsed.TotalSeconds >= 1)
                 {
-                    FPS = (int)(FPS * 0.9 + 0.1 * fpsCounter);
+                    FPS = (int)(FPS * 0.8 + 0.2 * fpsCounter);
                     ImageProcessing.FPS = FPS;
                     fpsCounter = 0;
                     TransferSpeed = (double)bytesSent / mb;
@@ -324,7 +324,7 @@ class Main
     {
         IsSendingEnabled = false;
         ImageProcessing.StopGettingFrames();
-        if (sendingThread!=null)
+        if (sendingThread != null)
         {
             if (sendingThread.IsAlive)
             {
@@ -352,8 +352,9 @@ class Main
     {
         Stopwatch stopwatch = Stopwatch.StartNew();
         int fpsCounter = 0;
-        int bytesSent=0;
+        int bytesSent = 0;
         int mb = 1024 * 1024;
+        FPS = 30;
         while (IsReceivingEnabled)
         {
             stopwatch.Restart();
@@ -388,7 +389,8 @@ class Main
                 bytesSent += ImageBytes.Length;
                 if (stopwatch.Elapsed.TotalSeconds >= 1)
                 {
-                    FPS = fpsCounter;
+                    FPS =(int) (FPS*0.8+0.2* fpsCounter);
+                    ImageProcessing.FPS = FPS;
                     fpsCounter = 0;
                     TransferSpeed = (double)bytesSent / mb;
                     bytesSent = 0;

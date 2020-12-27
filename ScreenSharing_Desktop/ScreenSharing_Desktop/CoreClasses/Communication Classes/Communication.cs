@@ -79,6 +79,8 @@ class Communication
     public byte[] GetResponseFromClient()
     {
         byte[] receivedData = server.GetData();
+        if (receivedData == null)
+            return null;
         byte[] responseBytes = new byte[receivedData.Length - HeaderLen];
         Array.Copy(receivedData, HeaderLen, responseBytes, 0, responseBytes.Length);
         return responseBytes;
@@ -86,26 +88,26 @@ class Communication
     #endregion
 
     #region Client Functions
-    
-    
+
+
     /// <summary>
     /// Connects to server with given ip at given port. This is used to receive file from another device.
     /// </summary>
     /// <param name="ip"></param>
     /// <param name="port"></param>
     /// <returns></returns>
-    public  bool ConnectToServer(string ip)
+    public bool ConnectToServer(string ip)
     {
         client = new Client(Port, BufferSize);
         isConnectedToServer = client.ConnectToServer(ip);
         return isConnectedToServer;
     }
-   
+
     /// <summary>
     /// Gets data from buffer and checks. returns file bytes only. you can directly write them to fileStream
     /// </summary>
     /// <returns>File Bytes as Byte array</returns>
-    public  byte[] ReceiveFilePacks()
+    public byte[] ReceiveFilePacks()
     {
         byte[] receivedData = client.GetData();                                     /// Get Data From Buffer
         if (receivedData == null)
@@ -136,28 +138,28 @@ class Communication
             return null;
         }
     }
-    
+
     public void SendResponseToServer(byte[] data)
     {
         int len = data.Length;
         byte[] dataToSend = new byte[len + HeaderLen];
-        byte[] headerBytes=PrepareDataHeader(Functions.SendingFile, len);
+        byte[] headerBytes = PrepareDataHeader(Functions.SendingFile, len);
         headerBytes.CopyTo(dataToSend, 0);
         data.CopyTo(dataToSend, HeaderLen);
         client.SendDataServer(dataToSend);
     }
-    public  void CloseClient()
+    public void CloseClient()
     {
         if (client == null)
             return;
-        isConnectedToServer= !client.DisconnectFromServer();
+        isConnectedToServer = !client.DisconnectFromServer();
         client = null;
     }
 
     #endregion
 
     #region Common Functions
-    private  byte[] PrepareDataHeader(Functions func, int len)
+    private byte[] PrepareDataHeader(Functions func, int len)
     {
         byte[] HeaderBytes = new byte[HeaderLen];
         HeaderBytes[0] = StartByte;
@@ -166,7 +168,7 @@ class Communication
         Array.Copy(lenBytes, 0, HeaderBytes, 3, lenBytes.Length);
         return HeaderBytes;
     }
-    private  int CalculatePackageCount(double fileSize)
+    private int CalculatePackageCount(double fileSize)
     {
         int packageCount = (int)Math.Ceiling(fileSize / (double)Main.PackSize);
         return packageCount;

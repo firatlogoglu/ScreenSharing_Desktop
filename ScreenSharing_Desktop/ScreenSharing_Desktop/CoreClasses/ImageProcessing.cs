@@ -16,7 +16,7 @@ class ImageProcessing
 {
     #region Variables
     public static int FPS;
-    private static double ResizeRatio=1;
+    private static double ResizeRatio = 1;
     private static Image<Bgr, byte> ScreenImage
     {
         get
@@ -46,13 +46,12 @@ class ImageProcessing
 
     private static void ScreenCapturer_OnCaptureStop(object sender, OnCaptureStopEventArgs e)
     {
-       Debug.WriteLine("Exception in capture: "+ e.Exception.ToString());
         ScreenCapturer.StartCapture();
     }
 
     private static void ScreenCapturer_OnScreenUpdated(object sender, OnScreenUpdatedEventArgs e)
     {
-        lock(lck_ScreenImage)
+        lock (lck_ScreenImage)
             _screenImage = new Image<Bgr, byte>(e.Bitmap);
         // ScreenImage.Save("C:\\Users\\CDS_Software02\\Desktop\\image.jpg");
     }
@@ -75,11 +74,11 @@ class ImageProcessing
         Image<Bgr, byte> img = GetScreenShot();
         double t1 = stp.Elapsed.TotalMilliseconds;
         //Image<Bgr, byte> img = new Image<Bgr, byte>(originalImage);
-        img.Draw(new CircleF(new PointF((float)CursorPosition.X, (float)CursorPosition.Y), 8), new Bgr(255, 0, 0),2);
+        img.Draw(new CircleF(new PointF((float)CursorPosition.X, (float)CursorPosition.Y), 8), new Bgr(255, 0, 0), 2);
         double t2 = stp.Elapsed.TotalMilliseconds;
         double t3;
         byte[] imageBytes;
-        if(FPS<-10)
+        if (FPS < -10)
         {
             ResizeRatio = FPS / 30.0;
             if (ResizeRatio == 0)
@@ -91,16 +90,16 @@ class ImageProcessing
         else
         {
             ResizeRatio = 1;
-             t3 = stp.Elapsed.TotalMilliseconds;
-            var resizedImage = img.Resize(0.5, Emgu.CV.CvEnum.Inter.Linear);
+            t3 = stp.Elapsed.TotalMilliseconds;
+            var resizedImage = img.Resize(1, Emgu.CV.CvEnum.Inter.Linear);
             imageBytes = ImageToByteArray(resizedImage.Bitmap);
         }
         //Debug.WriteLine("Resize Ratio: " + ResizeRatio);
         double t4 = stp.Elapsed.TotalMilliseconds;
-        Debug.WriteLine("  screenShot Time: " + t1 +" ms  drawTime: " + (t2 - t1) + " ms   resizeTime: " + (t3 - t2) + " ms  byte Array Time: " + (t4 - t3) + " ms");
+        Debug.WriteLine("  screenShot Time: " + t1 + " ms  drawTime: " + (t2 - t1) + " ms   resizeTime: " + (t3 - t2) + " ms  byte Array Time: " + (t4 - t3) + " ms");
         return imageBytes;
     }
-    private static Image<Bgr,byte> GetScreenShot()
+    private static Image<Bgr, byte> GetScreenShot()
     {
         try
 
@@ -132,6 +131,6 @@ class ImageProcessing
         }
         return bmp;
     }
-    
+
 
 }
